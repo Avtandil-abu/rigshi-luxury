@@ -210,7 +210,10 @@ export default function App() {
                         key={t_val}
                         disabled={isBooked}
                         onClick={() => { setBooking({ ...booking, time: t_val }); setStep(4) }}
-                        className={`py-5 rounded-2xl border font-black text-sm transition-all ${isBooked ? 'bg-zinc-950 text-zinc-800 opacity-30 cursor-not-allowed' : 'border-white/5 bg-zinc-900/30 hover:border-amber-500 hover:shadow-lg'}`}
+                        className={`py-5 rounded-2xl border font-black text-sm transition-all ${isBooked
+                            ? 'bg-red-950/10 border-red-950/20 text-red-900/60 cursor-not-allowed' // წითელი ელფერი, რომელიც ჩანს
+                            : 'border-white/5 bg-zinc-900/30 hover:border-amber-500 hover:shadow-lg'
+                          }`}
                       >
                         {isBooked ? t.booked : t_val}
                       </button>
