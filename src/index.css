@@ -1,0 +1,20 @@
+@import "tailwindcss";
+
+/* სქროლბარის გაქრობა ან გაფერადება */
+::-webkit-scrollbar {
+    width: 5px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #f59e0b;
+    /* ოქროსფერი */
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #d97706;
+}
