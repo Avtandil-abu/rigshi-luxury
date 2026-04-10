@@ -13,7 +13,7 @@ export default function App() {
   const [selectedStaff, setSelectedStaff] = useState(null);
   const [selectedServices, setSelectedServices] = useState([]);
   const [selectedAddons, setSelectedAddons] = useState([]);
-  const [selectedDate, setSelectedDate] = useState(getNextDays('GEO')[0]);
+  const [selectedDate, setSelectedDate] = useState(getNextDays('ENG')[0].value);
   const [booking, setBooking] = useState({ time: null, name: '', phone: '' });
 
   const [alert, setAlert] = useState({ open: false, msg: '', type: 'error' });
@@ -60,7 +60,7 @@ export default function App() {
     }
 
     const newBookingData = {
-      staff_name: selectedStaff.name,
+      staff_name: selectedStaff.name['GEO'],
       date: selectedDate,
       time: booking.time,
       user_name: booking.name,
@@ -126,8 +126,19 @@ export default function App() {
                   <button onClick={() => isAdmin ? setStep(6) : setIsAuthOpen(true)} className="text-3xl md:text-5xl font-black italic tracking-tighter mb-8 md:mb-12 text-center uppercase hover:text-amber-500 transition-colors shrink-0">Rigshi <span className="text-zinc-800">/ Luxury</span></button>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 pb-10 md:pb-0">
                     {SALON_DATA.staff.map(s => (
-                      <button key={s.id} onClick={() => { setSelectedStaff(s); setStep(2) }} whileHover={{ y: -5, scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }} className="flex flex-col items-center gap-4 p-6 md:p-8 bg-zinc-900/30 rounded-[2.5rem] border border-white/5 hover:border-amber-500/50 hover:scale-[1.02] transition-all group shrink-0"><img src={s.img} className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover grayscale group-hover:grayscale-0 transition-all border border-white/10 shadow-xl" /><div className="text-center"><p className="font-bold text-lg md:text-xl">{s.name}</p><p className="text-[10px] text-zinc-500 uppercase tracking-widest mt-1">{s.role[lang]}</p></div></button>
+                      <motion.button
+                        key={s.id}
+                        onClick={() => { setSelectedStaff(s); setStep(2) }}
+                        whileHover={{ y: -5, scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        className="flex flex-col items-center gap-4 p-6 md:p-8 bg-zinc-900/30 rounded-[2.5rem] border border-white/5 hover:border-amber-500/50 transition-all group shrink-0"
+                      >
+                        <img src={s.img} className="w-20 h-20 md:w-24 md:h-24 rounded-full object-cover grayscale group-hover:grayscale-0 transition-all border border-white/10 shadow-xl" />
+                        <div className="text-center">
+                          <p className="font-bold text-lg md:text-xl text-white">{s.name[lang]}</p>
+                          <p className="text-[10px] text-zinc-500 uppercase tracking-widest mt-1">{s.role[lang]}</p>
+                        </div>
+                      </motion.button>
                     ))}
                   </div>
                 </div>
@@ -136,7 +147,14 @@ export default function App() {
 
             {step === 2 && (
               <motion.div key="step2" {...pageVariants} transition={{ duration: 0.3 }} className="flex-1 flex flex-col overflow-hidden px-6 md:px-12">
-                <div className="py-3 flex justify-between items-end border-b border-white/5 bg-zinc-950/20 shrink-0"><button onClick={() => setStep(1)} className="text-[10px] font-black text-zinc-500 hover:text-amber-500 uppercase">← უკან</button><p className="text-amber-500 font-black italic text-3xl tracking-tighter">{totalPrice} ₾</p></div>
+                <div className="py-3 flex justify-between items-end border-b border-white/5 bg-zinc-950/20 shrink-0">
+                  <button
+                    onClick={() => setStep(1)}
+                    className="flex items-center gap-2 text-xs md:text-sm font-black text-zinc-400 mb-8 uppercase hover:text-amber-500 transition-all bg-white/5 w-fit px-4 py-2 rounded-full border border-white/5"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="m15 18-6-6 6-6" /></svg>
+                    {t.staffTitle}
+                  </button><p className="text-amber-500 font-black italic text-3xl tracking-tighter">{totalPrice} ₾</p></div>
                 <div className="flex-1 overflow-y-auto py-6 no-scrollbar">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                     {SALON_DATA.services.map(s => {
@@ -153,18 +171,49 @@ export default function App() {
             )}
 
             {step === 3 && selectedStaff && (
-              <motion.div key="step3" {...pageVariants} transition={{ duration: 0.3 }} className="p-8 flex-1 flex flex-col justify-center max-w-[900px] mx-auto w-full">
-                <button onClick={() => setStep(2)} className="text-[10px] font-black text-zinc-500 mb-6 uppercase hover:text-amber-500">← სერვისები</button>
-                <div className="flex gap-4 overflow-x-auto pb-8 no-scrollbar shrink-0">
-                  {getNextDays(lang).map(day => (
-                    <button key={day} onClick={() => setSelectedDate(day)} className={`flex-shrink-0 px-8 py-5 rounded-2xl border font-black text-[11px] uppercase transition-all ${selectedDate === day ? 'bg-amber-500 text-black shadow-lg scale-105' : 'bg-zinc-900/40 text-zinc-500'}`}>{day}</button>
+              <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="p-8 flex-1 flex flex-col justify-center max-w-[900px] mx-auto w-full">
+                <button onClick={() => setStep(2)} className="flex items-center gap-2 text-xs md:text-sm font-black text-zinc-400 mb-8 uppercase hover:text-amber-500 transition-all bg-white/5 w-fit px-4 py-2 rounded-full border border-white/5"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="m15 18-6-6 6-6" /></svg>
+                  {t.serviceTitle}
+                </button>
+
+                <div className="flex gap-4 overflow-x-auto pb-8 no-scrollbar shrink-0 px-2">
+                  {getNextDays(lang).map(dateObj => (
+                    <motion.button
+                      key={dateObj.value}
+                      onClick={() => setSelectedDate(dateObj.value)}
+                      whileTap={{ scale: 0.95 }}
+                      className={`flex-shrink-0 px-8 py-5 rounded-[2rem] border transition-all flex flex-col items-center min-w-[110px] ${selectedDate === dateObj.value
+                        ? 'bg-amber-500 border-amber-500 text-black shadow-lg scale-105'
+                        : 'bg-zinc-900/40 border-white/5 text-zinc-400'
+                        }`}
+                    >
+                      <span className="text-xs font-black uppercase italic">{dateObj.display}</span>
+                      <span className={`text-[10px] font-black uppercase mt-1 tracking-[0.2em] ${selectedDate === dateObj.value ? 'text-black/80' : 'text-amber-500'}`}>
+                        {dateObj.weekDay}
+                      </span>
+                    </motion.button>
                   ))}
                 </div>
+
                 <div className="grid grid-cols-4 gap-3">
-                  {TIMES.map(t_val => {
-                    const isBooked = allBookings.some(b => b.staff_name === selectedStaff.name && b.date === selectedDate && b.time === t_val);
+                  {['10:00', '11:30', '13:00', '14:30', '16:00', '17:30', '19:00', '20:30'].map(t_val => {
+                    if (t_val === "10:00") console.log("DB-დან:", allBookings[0]?.date, "საიტზე:", selectedDate);
+                    const isBooked = allBookings.some(b =>
+                      b.staff_name?.trim() === selectedStaff.name['GEO'].trim() &&
+                      b.date?.trim() === selectedDate.trim() &&
+                      b.time?.trim() === t_val.trim()
+                    );
                     return (
-                      <button key={t_val} disabled={isBooked} onClick={() => { setBooking({ ...booking, time: t_val }); setStep(4) }} className={`py-5 rounded-2xl border font-black text-sm transition-all ${isBooked ? 'bg-zinc-950 text-zinc-800 opacity-30 cursor-not-allowed' : 'border-white/5 bg-zinc-900/30 hover:border-amber-500 hover:shadow-lg'}`}>{t_val}</button>
+                      <button
+                        key={t_val}
+                        disabled={isBooked}
+                        onClick={() => { setBooking({ ...booking, time: t_val }); setStep(4) }}
+                        className={`py-5 rounded-2xl border font-black text-sm transition-all ${isBooked ? 'bg-zinc-950 text-zinc-800 opacity-30 cursor-not-allowed' : 'border-white/5 bg-zinc-900/30 hover:border-amber-500 hover:shadow-lg'}`}
+                      >
+                        {isBooked ? t.booked : t_val}
+                      </button>
                     )
                   })}
                 </div>
@@ -173,7 +222,11 @@ export default function App() {
 
             {step === 4 && (
               <motion.div key="step4" {...pageVariants} transition={{ duration: 0.3 }} className="p-8 flex-1 flex flex-col justify-center max-w-[420px] mx-auto w-full">
-                <button onClick={() => setStep(3)} className="text-[10px] font-black text-zinc-500 mb-4 uppercase tracking-widest">← დრო</button>
+                <button onClick={() => setStep(3)} className="flex items-center gap-2 text-xs md:text-sm font-black text-zinc-400 mb-8 uppercase hover:text-amber-500 transition-all bg-white/5 w-fit px-4 py-2 rounded-full border border-white/5"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><path d="m15 18-6-6 6-6" /></svg>
+                  {t.timeTitle}
+                </button>
                 <div className="bg-zinc-900/40 p-6 rounded-[2rem] border border-white/10 text-center mb-6"><p className="text-amber-500 font-black italic text-4xl leading-none">{booking.time}</p><p className="text-zinc-400 text-[10px] font-black uppercase mt-2 tracking-widest">{selectedDate}</p></div>
                 <div className="space-y-3">
                   <input type="text" placeholder="თქვენი სახელი" className="w-full p-4 bg-zinc-900/60 border border-white/5 rounded-2xl text-zinc-100 font-bold outline-none focus:border-amber-500/50" value={booking.name} onChange={(e) => setBooking({ ...booking, name: e.target.value })} />
