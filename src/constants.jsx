@@ -29,9 +29,27 @@ export const TRANSLATIONS = {
 
 export const SALON_DATA = {
     staff: [
-        { id: 1, name: "ალექსანდრე", role: { GEO: "Creative Director", ENG: "Creative Director", RUS: "Креативный директор" }, img: "https://images.unsplash.com/photo-1599566150163-29194dcaad36?q=80&w=200&h=200&auto=format&fit=crop", badge: "Expert" },
-        { id: 2, name: "ნატალი", role: { GEO: "Color Master", ENG: "Color Master", RUS: "Колорист" }, img: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?q=80&w=200&h=200&auto=format&fit=crop", badge: "Master" },
-        { id: 3, name: "მარიამი", role: { GEO: "Nail Artist", ENG: "Nail Artist", RUS: "Мастер маникურ" }, img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=200&h=200&auto=format&fit=crop", badge: "Top" }
+        {
+            id: 1,
+            name: "ალექსანდრე",
+            // პროფესიონალი სტილისტი მამაკაცი
+            img: "https://images.unsplash.com/photo-1503460293376-4314e758a1e2?q=80&w=400&auto=format&fit=crop",
+            role: { GEO: "CREATIVE DIRECTOR", EN: "CREATIVE DIRECTOR", RU: "КРЕАТИВНЫЙ ДИРЕКТОР" }
+        },
+        {
+            id: 2,
+            name: "ნატალი",
+            // პროფესიონალი სტილისტი ქალი
+            img: "https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?q=80&w=400&auto=format&fit=crop",
+            role: { GEO: "COLOR MASTER", EN: "COLOR MASTER", RU: "МАСТЕР КОЛОРИСТ" }
+        },
+        {
+            id: 3,
+            name: "მარიამი",
+            // ფრჩხილების სპეციალისტი
+            img: "https://images.unsplash.com/photo-1632345031435-8727f6897d53?q=80&w=400&auto=format&fit=crop",
+            role: { GEO: "NAIL ARTIST", EN: "NAIL ARTIST", RU: "МАСТЕР МАНИКЮРА" }
+        }
     ],
     services: [
         { id: 101, name: { GEO: "შეჭრა + Ritual", ENG: "Haircut + Ritual", RUS: "Стрижка + Ритуал" }, price: 65, desc: "Kérastase Premium" },
