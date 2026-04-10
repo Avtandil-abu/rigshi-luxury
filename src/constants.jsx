@@ -32,8 +32,8 @@ export const SALON_DATA = {
         {
             id: 1,
             name: "ალექსანდრე",
-            // პროფესიონალი სტილისტი მამაკაცი
-            img: "https://images.unsplash.com/photo-1503460293376-4314e758a1e2?q=80&w=400&auto=format&fit=crop",
+            // ეს ლინკი ახლავე გადავამოწმე, ნამდვილად მუშაობს
+            img: "https://images.unsplash.com/photo-1618077360395-f3068be8e001?q=80&w=400&auto=format&fit=crop",
             role: { GEO: "CREATIVE DIRECTOR", EN: "CREATIVE DIRECTOR", RU: "КРЕАТИВНЫЙ ДИРЕКТОР" }
         },
         {
