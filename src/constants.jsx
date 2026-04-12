@@ -29,9 +29,9 @@ export const getNextDays = (lang) => {
 };
 
 export const TRANSLATIONS = {
-    GEO: { subtitle: "ავანგარდ ლაქშერი", staffTitle: "აირჩიე სტილისტი", serviceTitle: "მომსახურება", addonTitle: "დაამატე კომფორტისთვის", timeTitle: "თარიღი და დრო", bookBtn: "დაჯავშნა", successMsg: "წარმატებით დაჯავშნე!", backBtn: "მთავარზე დაბრუნება", booked: "დაკავებულია" },
-    ENG: { subtitle: "AVANGARD LUXURY", staffTitle: "Select Specialist", serviceTitle: "Services", addonTitle: "Add for Comfort", timeTitle: "Date & Time", bookBtn: "Confirm Booking", successMsg: "Booking Confirmed!", backBtn: "Back to Home", booked: "Booked" },
-    RUS: { subtitle: "АВАНГАРД ЛАКШЕРИ", staffTitle: "Выберите мастера", serviceTitle: "Услуги", addonTitle: "Добавить для комфорта", timeTitle: "Дата и время", bookBtn: "Забронировать", successMsg: "Запись подтверждена!", backBtn: "На главную", booked: "Занято" }
+    GEO: { subtitle: "ავანგარდ ლაქშერი", staffTitle: "აირჩიე სტილისტი", serviceTitle: "მომსახურება", addonTitle: "დაამატე კომფორტისთვის", timeTitle: "თარიღი და დრო", bookBtn: "დაჯავშნა", successMsg: "წარმატებით დაჯავშნე!", backBtn: "მთავარზე დაბრუნება", booked: "დაკავებულია", longVisitWarning: "ვიზიტი შეიძლება გაიწელოს 3 საათზე მეტ ხანს — გთხოვთ დაუკავშირდეთ სალონს", namePlaceholder: "თქვენი სახელი", phonePlaceholder: "ტელეფონი", nextBtn: "შემდეგი" },
+    ENG: { subtitle: "AVANGARD LUXURY", staffTitle: "Select Specialist", serviceTitle: "Services", addonTitle: "Add for Comfort", timeTitle: "Date & Time", bookBtn: "Confirm Booking", successMsg: "Booking Confirmed!", backBtn: "Back to Home", booked: "Booked", longVisitWarning: "Visit may exceed 3 hours — please contact the salon", namePlaceholder: "Your Name", phonePlaceholder: "Phone Number", nextBtn: "Next" },
+    RUS: { subtitle: "АВАНГАРД ЛАКШЕРИ", staffTitle: "Выберите мастера", serviceTitle: "Услуги", addonTitle: "Добавить для комфорта", timeTitle: "Дата и время", bookBtn: "Забронировать", successMsg: "Запись подтверждена!", backBtn: "На главную", booked: "Занято", longVisitWarning: "Визит может занять 3+ часа — пожалуйста, свяжитесь с салоном", namePlaceholder: "Ваше имя", phonePlaceholder: "Номер телефона", nextBtn: "Далее" }
 };
 
 export const SALON_DATA = {
@@ -41,17 +41,17 @@ export const SALON_DATA = {
         { id: 3, name: { GEO: "მარიამი", ENG: "MARIAM", RUS: "МАРИАМ" }, img: "https://images.unsplash.com/photo-1632345031435-8727f6897d53?q=80&w=400&auto=format&fit=crop", role: { GEO: "NAIL ARTIST", ENG: "NAIL ARTIST", RUS: "МАСТЕР МАНИКЮРА" } }
     ],
     services: [
-        { id: 101, name: { GEO: "შეჭრა + Ritual", ENG: "Haircut + Ritual", RUS: "Стрижка + Ритуал" }, price: 65, desc: "Kérastase Premium" },
-        { id: 102, name: { GEO: "Balayage / AirTouch", ENG: "Balayage / AirTouch", RUS: "Балаяж / AirTouch" }, price: 250, desc: "Olaplex Treatment" },
-        { id: 103, name: { GEO: "კერატინი", ENG: "Keratin", RUS: "Кератин" }, price: 180, desc: "Luxe Restoration" },
-        { id: 201, name: { GEO: "შილაკი + დიზაინი", ENG: "Shellac + Design", RUS: "Шиллак + Дизайн" }, price: 55, desc: "Luxio Gel" },
-        { id: 202, name: { GEO: "Smart პედიკური", ENG: "Smart Pedicure", RUS: "Смарт педикюр" }, price: 80, desc: "Feet Spa" },
-        { id: 301, name: { GEO: "სახის წმენდა", ENG: "Deep Cleansing", RUS: "Чистка лица" }, price: 150, desc: "HydraFacial" },
-        { id: 401, name: { GEO: "ვიზაჟი", ENG: "Makeup", RUS: "Визаж" }, price: 110, desc: "Glamour Look" }
+        { id: 101, name: { GEO: "შეჭრა + რიტუალი", ENG: "Haircut + Ritual", RUS: "Стрижка + Ритуал" }, price: 65, desc: "Kérastase Premium", duration: 60 },
+        { id: 102, name: { GEO: "ბალაიაჟი / AirTouch", ENG: "Balayage / AirTouch", RUS: "Балаяж / AirTouch" }, price: 250, desc: "Olaplex Treatment", duration: 120 },
+        { id: 103, name: { GEO: "კერატინი", ENG: "Keratin", RUS: "Кератин" }, price: 180, desc: "Luxe Restoration", duration: 90 },
+        { id: 201, name: { GEO: "შილაქი + დიზაინი", ENG: "Shellac + Design", RUS: "Шиллак + Дизайн" }, price: 55, desc: "Luxio Gel", duration: 60 },
+        { id: 202, name: { GEO: "პედიკური", ENG: "Smart Pedicure", RUS: "Смарт педикюр" }, price: 80, desc: "Feet Spa", duration: 75 },
+        { id: 301, name: { GEO: "სახის წმენდა", ENG: "Deep Cleansing", RUS: "Чистка лица" }, price: 150, desc: "HydraFacial", duration: 90 },
+        { id: 401, name: { GEO: "ვიზაჟი", ENG: "Makeup", RUS: "Визаж" }, price: 110, desc: "Glamour Look", duration: 60 }
     ],
     addons: [
-        { id: 1, name: { GEO: "ესპრესო", ENG: "Espresso", RUS: "Кофе" }, price: 0, icon: "☕" },
-        { id: 2, name: { GEO: "მასაჟი", ENG: "Massage", RUS: "Массаж" }, price: 15, icon: "💆‍♀️" },
-        { id: 3, name: { GEO: "ნიღაბი", ENG: "Mask", RUS: "Маска" }, price: 25, icon: "✨" }
+        { id: 1, name: { GEO: "ესპრესო", ENG: "Espresso", RUS: "Кофе" }, price: 0, icon: "☕", duration: 0 },
+        { id: 2, name: { GEO: "მასაჟი", ENG: "Massage", RUS: "Массаж" }, price: 15, icon: "💆‍♀️", duration: 30 },
+        { id: 3, name: { GEO: "ნიღაბი", ENG: "Mask", RUS: "Маска" }, price: 25, icon: "✨", duration: 20 }
     ]
 };
