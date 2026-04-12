@@ -115,34 +115,65 @@ export default function App() {
     setBooking({ time: null, name: '', phone: '' });
   };
 
-  const addToCalendar = () => {
-    const currentYear = new Date().getFullYear();
-    const eventDate = new Date(`${selectedDate}, ${currentYear}`);
+  const addToCalendar = (e) => {
+    if (e) e.preventDefault();
 
-    const year = eventDate.getFullYear();
-    const month = String(eventDate.getMonth() + 1).padStart(2, '0');
-    const day = String(eventDate.getDate()).padStart(2, '0');
-    const formattedDate = `${year}${month}${day}`;
+    try {
+      // 1. თვეების რუკა - დავამატე ყველა შესაძლო ვარიანტი დაზღვევისთვის
+      const monthMap = {
+        'იან': '01', 'თებ': '02', 'მარ': '03', 'აპრ': '04', 'მაი': '05', 'ივნ': '06',
+        'ივლ': '07', 'აგვ': '08', 'სექ': '09', 'ოქტ': '10', 'ნოე': '11', 'დეკ': '12',
+        'Jan': '01', 'Feb': '02', 'Mar': '03', 'Apr': '04', 'May': '05', 'Jun': '06',
+        'Jul': '07', 'Aug': '08', 'Sep': '09', 'Oct': '10', 'Nov': '11', 'Dec': '12',
+        'Янв': '01', 'Фев': '02', 'Мар': '03', 'Апр': '04', 'Май': '05', 'Июн': '06',
+        'Июл': '07', 'Авг': '08', 'Сен': '09', 'Окт': '10', 'Ноя': '11', 'Дек': '12'
+      };
 
-    // 1. დროს ვამატებთ წამებს (00), რომ გახდეს 6-ციფრიანი (მაგ: 140000)
-    const startTime = booking.time.replace(':', '') + "00";
+      // 2. თარიღის დაშლა (ვასუფთავებთ ზედმეტი ჰარებისგან)
+      const dateStr = selectedDate.trim();
+      const parts = dateStr.split(' '); // მაგ: ["16", "აპრ"]
 
-    // 2. დასრულების დროდ ავტომატურად ვსვამთ +1 საათს
-    let endHour = parseInt(booking.time.split(':')[0]) + 1;
-    const endMinutes = booking.time.split(':')[1];
-    const endTime = `${String(endHour).padStart(2, '0')}${endMinutes}00`;
+      // ვამოწმებთ, რომელია რიცხვი და რომელი თვე
+      let day = parts[0].match(/\d+/) ? parts[0].padStart(2, '0') : parts[1].padStart(2, '0');
+      let monthName = parts[0].match(/\d+/) ? parts[1] : parts[0];
 
-    // 3. ვასწორებთ "undefined" სახელს და სხვა დეტალებს
-    const serviceName = selectedService?.name[lang] || "Luxury Service";
-    const staffName = selectedStaff?.name[lang] || "Stylist";
+      const month = monthMap[monthName] || '04';
+      const year = "2026"; // წელი პირდაპირ ჩავწეროთ, რომ 1922 აღარ განმეორდეს
 
-    const title = encodeURIComponent(`Luxury Visit: ${serviceName}`);
-    const details = encodeURIComponent(`Appointment with ${staffName}. Location: Rigshi Luxury Salon.`);
+      const formattedDate = `${year}${month}${day}`;
 
-    // 4. ვაშორებთ 'Z'-ს ბოლოდან, რომ კალენდარმა იუზერის ლოკალური დრო გამოიყენოს
-    const googleUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${formattedDate}T${startTime}/${formattedDate}T${endTime}&details=${details}`;
+      // 3. დროის აწყობა
+      const time = booking?.time || "10:00";
+      const startTime = time.replace(':', '') + "00";
+      let endHour = (parseInt(time.split(':')[0]) + 1).toString().padStart(2, '0');
+      const endTime = `${endHour}${time.split(':')[1]}00`;
 
-    window.open(googleUrl, '_blank');
+      // 4. ტექსტები სამ ენაზე
+      const content = {
+        GE: { title: 'Luxury ვიზიტი', staff: 'სტილისტი' },
+        EN: { title: 'Luxury Visit', staff: 'Stylist' },
+        RU: { title: 'Luxury Визит', staff: 'Стилист' }
+      };
+      const cur = content[lang] || content.EN;
+
+      const serviceNames = selectedServices?.map(s => s.name[lang]).join(', ') || "";
+      const staffName = selectedStaff?.name[lang] || "";
+
+      const calTitle = encodeURIComponent(`${cur.title}: ${serviceNames}`);
+      const calDetails = encodeURIComponent(`${cur.staff}: ${staffName}. Services: ${serviceNames}.`);
+
+      // 5. საბოლოო URL
+      const googleUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${calTitle}&dates=${formattedDate}T${startTime}/${formattedDate}T${endTime}&details=${calDetails}`;
+
+      // შემოწმება კონსოლში
+      console.log("Calendar URL:", googleUrl);
+
+      // გადამისამართება
+      window.location.href = googleUrl;
+
+    } catch (error) {
+      console.error("Calendar Error:", error);
+    }
   };
 
   const totalPrice = selectedServices.reduce((a, b) => a + b.price, 0) + selectedAddons.reduce((a, b) => a + b.price, 0);
@@ -381,7 +412,11 @@ export default function App() {
                 <div className="w-20 h-20 bg-amber-500 text-black rounded-full flex items-center justify-center text-4xl shadow-[0_0_50px_rgba(245,158,11,0.4)] mb-8 font-black animate-bounce">✓</div>
                 <h2 className="text-3xl md:text-5xl font-black uppercase italic tracking-tighter leading-tight mb-4 text-white">წარმატებით დაჯავშნე!</h2>
                 <div className="flex flex-col gap-3 items-center">
-                  <button onClick={addToCalendar} className="px-8 py-4 bg-white/5 border border-amber-500/30 text-amber-500 rounded-2xl text-[10px] font-black uppercase hover:bg-amber-500 hover:text-black transition-all shadow-xl">📅 კალენდარში დამატება</button>
+                  <button onClick={addToCalendar} style={{
+                    zIndex: 9999,      // აიტანს ყველაზე ზემოთ
+                    position: 'relative',
+                    cursor: 'pointer'
+                  }} className="px-8 py-4 bg-white/5 border border-amber-500/30 text-amber-500 rounded-2xl text-[10px] font-black uppercase hover:bg-amber-500 hover:text-black transition-all shadow-xl">📅 კალენდარში დამატება</button>
                   <button onClick={resetAll} className="mt-4 text-[11px] font-black text-amber-500/40 hover:text-amber-500 border-b border-white/5 uppercase pb-1 transition-all tracking-widest">მთავარზე დაბრუნება</button>
                 </div>
               </motion.div>

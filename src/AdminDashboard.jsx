@@ -22,6 +22,33 @@ export default function AdminDashboard({ allBookings, setAllBookings, staffData,
         return () => window.removeEventListener('keydown', handleEsc);
     }, [onClose, editingBooking, confirmDelete]);
 
+    // --- WhatsApp შეტყობინებების ლოგიკა (3 ენაზე) ---
+    const notifyViaWhatsApp = (phone, name, time, date, cancelled = false) => {
+        const cleanPhone = phone.replace(/\s+/g, '');
+
+        // ვიყენებთ ზუსტად იმ კოდებს (GEO, ENG, RUS), რაც შენს ბაზაშია
+        const messages = {
+            GEO: {
+                cancel: `გამარჯობა ${name}, თქვენი ჯავშანი (${date}, ${time}) სალონში "Rigshi Luxury" გაუქმებულია.`,
+                update: `გამარჯობა ${name}, თქვენს ჯავშანში შევიდა ცვლილება. ახალი დრო: ${date}, ${time}.`
+            },
+            ENG: {
+                cancel: `Hello ${name}, your booking at "Rigshi Luxury" on ${date} at ${time} has been cancelled.`,
+                update: `Hello ${name}, your booking has been updated. New time: ${date} at ${time}.`
+            },
+            RUS: {
+                cancel: `Здравствуйте ${name}, ваша запись в "Rigshi Luxury" (${date}, ${time}) отменена.`,
+                update: `Здравствуйте ${name}, в вашу запись внесены изменения. Новое время: ${date}, ${time}.`
+            }
+        };
+
+        // ვიღებთ მესიჯს არჩეული ენის მიხედვით, თუ რამე აირია - ვიყენებთ ქართულს (GEO)
+        const currentMsgMap = messages[lang] || messages.GEO;
+        const msg = cancelled ? currentMsgMap.cancel : currentMsgMap.update;
+
+        window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+    };
+
     const deleteBooking = async (id) => {
         const { error } = await supabase.from('bookings').delete().eq('id', id);
         if (!error) {
@@ -48,18 +75,12 @@ export default function AdminDashboard({ allBookings, setAllBookings, staffData,
             setAllBookings(allBookings.map(b =>
                 b.id === editingBooking.id ? { ...b, time: newTime, date: newDate } : b
             ));
+            // შეტყობინების გაგზავნა განახლებაზე
+            notifyViaWhatsApp(editingBooking.user_phone, editingBooking.user_name, newTime, newDate, false);
             setEditingBooking(null);
         } else {
             alert('შეცდომა: ' + error.message);
         }
-    };
-
-    const notifyViaWhatsApp = (phone, name, time, date, cancelled = false) => {
-        const msg = cancelled
-            ? `გამარჯობა ${name}, სალონიდან გწერთ. თქვენი ჯავშანი (${date}, ${time}) გაუქმდა.`
-            : `გამარჯობა ${name}, სალონიდან გწერთ. თქვენი ჯავშნის დრო შეიცვალა: ${date}, ${time}.`;
-        const encodedMsg = encodeURIComponent(msg);
-        window.open(`https://wa.me/${phone}?text=${encodedMsg}`, '_blank');
     };
 
     const totalRevenue = allBookings.reduce((s, b) => s + (b.total_price || 0), 0);
@@ -70,7 +91,6 @@ export default function AdminDashboard({ allBookings, setAllBookings, staffData,
         return { bookings: masterBookings, revenue, count: masterBookings.length };
     };
 
-    // წაშლის დადასტურების Modal
     const ConfirmDeleteModal = () => (
         <div className="fixed inset-0 z-[300] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
             <div className="w-full max-w-[350px] bg-zinc-900 border border-red-500/30 p-8 rounded-[2.5rem] shadow-2xl text-center">
@@ -81,7 +101,9 @@ export default function AdminDashboard({ allBookings, setAllBookings, staffData,
                     <button onClick={() => setConfirmDelete(null)} className="flex-1 py-3 text-xs font-black uppercase text-zinc-500 hover:text-white transition-all">არა</button>
                     <button onClick={() => {
                         const booking = allBookings.find(b => b.id === confirmDelete);
-                        if (booking) notifyViaWhatsApp(booking.user_phone, booking.user_name, booking.time, booking.date, true);
+                        if (booking) {
+                            notifyViaWhatsApp(booking.user_phone, booking.user_name, booking.time, booking.date, true);
+                        }
                         deleteBooking(confirmDelete);
                     }} className="flex-1 py-3 bg-red-500 text-white rounded-xl text-xs font-black uppercase shadow-lg">დიახ</button>
                 </div>
@@ -93,7 +115,6 @@ export default function AdminDashboard({ allBookings, setAllBookings, staffData,
         const stats = getMasterStats(viewedMaster.name);
         return (
             <div className="h-full flex flex-col bg-[#08080a] animate-in slide-in-from-right-8 duration-500 overflow-hidden">
-
                 {confirmDelete && <ConfirmDeleteModal />}
 
                 {editingBooking && (
@@ -115,7 +136,7 @@ export default function AdminDashboard({ allBookings, setAllBookings, staffData,
                             </div>
                             <div className="flex gap-2">
                                 <button onClick={() => setEditingBooking(null)} className="flex-1 py-3 text-xs font-black uppercase text-zinc-500 hover:text-white transition-all">გაუქმება</button>
-                                <button onClick={() => { saveEdit(); notifyViaWhatsApp(editingBooking.user_phone, editingBooking.user_name, newTime, newDate); }} className="flex-1 py-3 bg-amber-500 text-black rounded-xl text-xs font-black uppercase shadow-lg">შენახვა + WhatsApp</button>
+                                <button onClick={saveEdit} className="flex-1 py-3 bg-amber-500 text-black rounded-xl text-xs font-black uppercase shadow-lg">შენახვა + WhatsApp</button>
                             </div>
                         </div>
                     </div>
@@ -161,9 +182,6 @@ export default function AdminDashboard({ allBookings, setAllBookings, staffData,
                                         <button onClick={() => openEdit(b)} className="p-3 bg-amber-500/10 text-amber-500 rounded-2xl hover:bg-amber-500 hover:text-black transition-all">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" /><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" /></svg>
                                         </button>
-                                        <button onClick={() => notifyViaWhatsApp(b.user_phone, b.user_name, b.time, b.date, true)} className="p-3 bg-green-500/10 text-green-500 rounded-2xl hover:bg-green-500 hover:text-white transition-all">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 1 1-7.6-11.7 8.38 8.38 0 0 1 3.8.9L21 3z" /></svg>
-                                        </button>
                                         <button onClick={() => setConfirmDelete(b.id)} className="p-3 bg-red-500/10 text-red-500 rounded-2xl hover:bg-red-500 hover:text-white transition-all">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /></svg>
                                         </button>
@@ -179,9 +197,7 @@ export default function AdminDashboard({ allBookings, setAllBookings, staffData,
 
     return (
         <div className="h-full flex flex-col bg-[#08080a] animate-in fade-in duration-500 overflow-hidden relative">
-
             {confirmDelete && <ConfirmDeleteModal />}
-
             <div className="px-8 py-4 border-b border-white/5 bg-zinc-950/50 flex justify-between items-center shrink-0">
                 <div>
                     <h2 className="text-xl font-black uppercase text-amber-500 italic tracking-tighter leading-none">ბიზნესის მართვა</h2>
