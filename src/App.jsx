@@ -116,7 +116,6 @@ export default function App() {
   };
 
   const addToCalendar = (e) => {
-    if (e) e.preventDefault();
 
     try {
       const monthMap = {
@@ -425,11 +424,25 @@ export default function App() {
                 <div className="w-20 h-20 bg-amber-500 text-black rounded-full flex items-center justify-center text-4xl shadow-[0_0_50px_rgba(245,158,11,0.4)] mb-8 font-black animate-bounce">✓</div>
                 <h2 className="text-3xl md:text-5xl font-black uppercase italic tracking-tighter leading-tight mb-4 text-white">წარმატებით დაჯავშნე!</h2>
                 <div className="flex flex-col gap-3 items-center">
-                  <button onClick={addToCalendar} style={{
-                    zIndex: 9999,      // აიტანს ყველაზე ზემოთ
-                    position: 'relative',
-                    cursor: 'pointer'
-                  }} className="px-8 py-4 bg-white/5 border border-amber-500/30 text-amber-500 rounded-2xl text-[10px] font-black uppercase hover:bg-amber-500 hover:text-black transition-all shadow-xl">📅 კალენდარში დამატება</button>
+                  <button
+                    // 1. აიფონზე თითის დაჭერისას პირდაპირ ვიძახებთ ფუნქციას
+                    onTouchStart={(e) => {
+                      console.log("Touch started!");
+                      addToCalendar(); // (e) აღარ გადასცე
+                    }}
+                    // 2. onClick-ს ვუბლოკავთ თავის საქმეს, რომ მეორედ აღარ გაეშვას
+                    onClick={(e) => e.preventDefault()}
+                    style={{
+                      zIndex: 999999,
+                      position: 'relative',
+                      pointerEvents: 'auto',
+                      cursor: 'pointer',
+                      WebkitTapHighlightColor: 'transparent'
+                    }}
+                    className="px-8 py-4 bg-white/5 border border-amber-500/30 text-amber-500 rounded-2xl text-[10px] font-black uppercase active:scale-95 transition-all shadow-xl"
+                  >
+                    📅 კალენდარში დამატება
+                  </button>
                   <button onClick={resetAll} className="mt-4 text-[11px] font-black text-amber-500/40 hover:text-amber-500 border-b border-white/5 uppercase pb-1 transition-all tracking-widest">მთავარზე დაბრუნება</button>
                 </div>
               </motion.div>
