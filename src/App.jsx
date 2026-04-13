@@ -119,7 +119,6 @@ export default function App() {
     if (e) e.preventDefault();
 
     try {
-      // 1. თვეების რუკა - დავამატე ყველა შესაძლო ვარიანტი დაზღვევისთვის
       const monthMap = {
         'იან': '01', 'თებ': '02', 'მარ': '03', 'აპრ': '04', 'მაი': '05', 'ივნ': '06',
         'ივლ': '07', 'აგვ': '08', 'სექ': '09', 'ოქტ': '10', 'ნოე': '11', 'დეკ': '12',
@@ -129,47 +128,58 @@ export default function App() {
         'Июл': '07', 'Авг': '08', 'Сен': '09', 'Окт': '10', 'Ноя': '11', 'Дек': '12'
       };
 
-      // 2. თარიღის დაშლა (ვასუფთავებთ ზედმეტი ჰარებისგან)
       const dateStr = selectedDate.trim();
-      const parts = dateStr.split(' '); // მაგ: ["16", "აპრ"]
-
-      // ვამოწმებთ, რომელია რიცხვი და რომელი თვე
+      const parts = dateStr.split(' ');
       let day = parts[0].match(/\d+/) ? parts[0].padStart(2, '0') : parts[1].padStart(2, '0');
       let monthName = parts[0].match(/\d+/) ? parts[1] : parts[0];
 
       const month = monthMap[monthName] || '04';
-      const year = "2026"; // წელი პირდაპირ ჩავწეროთ, რომ 1922 აღარ განმეორდეს
-
+      const year = "2026";
       const formattedDate = `${year}${month}${day}`;
 
-      // 3. დროის აწყობა
       const time = booking?.time || "10:00";
       const startTime = time.replace(':', '') + "00";
       let endHour = (parseInt(time.split(':')[0]) + 1).toString().padStart(2, '0');
       const endTime = `${endHour}${time.split(':')[1]}00`;
 
-      // 4. ტექსტები სამ ენაზე
       const content = {
         GE: { title: 'Luxury ვიზიტი', staff: 'სტილისტი' },
         EN: { title: 'Luxury Visit', staff: 'Stylist' },
         RU: { title: 'Luxury Визит', staff: 'Стилист' }
       };
       const cur = content[lang] || content.EN;
-
       const serviceNames = selectedServices?.map(s => s.name[lang]).join(', ') || "";
       const staffName = selectedStaff?.name[lang] || "";
 
-      const calTitle = encodeURIComponent(`${cur.title}: ${serviceNames}`);
-      const calDetails = encodeURIComponent(`${cur.staff}: ${staffName}. Services: ${serviceNames}.`);
+      // --- აი აქედან იცვლება ყველაფერი აიფონისთვის ---
 
-      // 5. საბოლოო URL
-      const googleUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${calTitle}&dates=${formattedDate}T${startTime}/${formattedDate}T${endTime}&details=${calDetails}`;
+      const icsContent = [
+        "BEGIN:VCALENDAR",
+        "VERSION:2.0",
+        "PRODID:-//Rigshi Luxury//NONSGML v1.0//EN",
+        "BEGIN:VEVENT",
+        `SUMMARY:${cur.title}: ${serviceNames}`,
+        `DTSTART:${formattedDate}T${startTime}`,
+        `DTEND:${formattedDate}T${endTime}`,
+        `DESCRIPTION:${cur.staff}: ${staffName}\\nServices: ${serviceNames}`,
+        "LOCATION:Tbilisi, Georgia",
+        "END:VEVENT",
+        "END:VCALENDAR"
+      ].join("\n");
 
-      // შემოწმება კონსოლში
-      console.log("Calendar URL:", googleUrl);
+      // ვქმნით ფაილს (Blob)
+      const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
+      const url = window.URL.createObjectURL(blob);
 
-      // გადამისამართება
-      window.location.href = googleUrl;
+      // ვაიძულებთ ბრაუზერს გადმოწეროს/გახსნას ფაილი
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "rigshi-booking.ics");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      console.log("Native Calendar file triggered!");
 
     } catch (error) {
       console.error("Calendar Error:", error);
@@ -241,6 +251,9 @@ export default function App() {
               <motion.div key="step1" {...pageVariants} transition={{ duration: 0.3 }} className="flex-1 overflow-y-auto no-scrollbar py-6 md:py-0">
                 <div className="p-6 md:p-8 flex flex-col md:justify-center min-h-full max-w-[900px] mx-auto w-full px-6 md:px-12">
                   <button onClick={() => isAdmin ? setStep(6) : setIsAuthOpen(true)} className="text-3xl md:text-5xl font-black italic tracking-tighter mb-8 md:mb-12 text-center uppercase hover:text-amber-500 transition-colors shrink-0">Rigshi <span className="text-zinc-800">/ Luxury</span></button>
+                  <h2 className="text-center text-sm md:text-base uppercase tracking-[0.2em] font-medium text-amber-500/90 mb-10">
+                    აირჩიეთ მასტერი
+                  </h2>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 pb-10 md:pb-0">
                     {SALON_DATA.staff.map(s => (
                       <motion.button

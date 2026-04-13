@@ -10,6 +10,11 @@ export default function AdminDashboard({ allBookings, setAllBookings, staffData,
     const [newTime, setNewTime] = useState('');
     const [newDate, setNewDate] = useState('');
 
+    const playAlert = () => {
+        const audio = new Audio('/alert.mp3');
+        audio.play().catch(e => console.log("ხმის დაკვრა დაიბლოკა, დააწკაპუნეთ ეკრანზე!"));
+    };
+
     useEffect(() => {
         const handleEsc = (event) => {
             if (event.key === 'Escape') {
@@ -22,9 +27,34 @@ export default function AdminDashboard({ allBookings, setAllBookings, staffData,
         return () => window.removeEventListener('keydown', handleEsc);
     }, [onClose, editingBooking, confirmDelete]);
 
+    useEffect(() => {
+        // ვქმნით არხს, რომელიც უსმენს INSERT-ს (ახალ ჩანაწერს)
+        const channel = supabase
+            .channel('admin-notifications')
+            .on(
+                'postgres_changes',
+                { event: 'INSERT', schema: 'public', table: 'bookings' },
+                (payload) => {
+                    console.log('ახალი ჯავშანი მოვიდა!', payload.new);
+
+                    // 1. ვამატებთ ახალ ჯავშანს სიის სათავეში, რომ ეგრევე გამოჩნდეს
+                    setAllBookings(prev => [payload.new, ...prev]);
+
+                    // 2. ვრთავთ ხმას (გლოვოს პონტში)
+                    playAlert();
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [setAllBookings]);
+
     // --- WhatsApp შეტყობინებების ლოგიკა (3 ენაზე) ---
     const notifyViaWhatsApp = (phone, name, time, date, cancelled = false) => {
         const cleanPhone = phone.replace(/\s+/g, '');
+        // ხმის დაკვრის ფუნქცია
 
         // ვიყენებთ ზუსტად იმ კოდებს (GEO, ENG, RUS), რაც შენს ბაზაშია
         const messages = {
@@ -46,7 +76,7 @@ export default function AdminDashboard({ allBookings, setAllBookings, staffData,
         const currentMsgMap = messages[lang] || messages.GEO;
         const msg = cancelled ? currentMsgMap.cancel : currentMsgMap.update;
 
-        window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+        window.location.href = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
     };
 
     const deleteBooking = async (id) => {
@@ -82,6 +112,7 @@ export default function AdminDashboard({ allBookings, setAllBookings, staffData,
             alert('შეცდომა: ' + error.message);
         }
     };
+    // --- ნატიური კალენდრის ფუნქცია ---
 
     const totalRevenue = allBookings.reduce((s, b) => s + (b.total_price || 0), 0);
 
