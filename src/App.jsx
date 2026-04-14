@@ -7,6 +7,7 @@ import { supabase } from './supabaseClient'
 import emailjs from '@emailjs/browser'
 import { useSpring, animated } from '@react-spring/web'
 import confetti from 'canvas-confetti'
+import { Analytics } from "@vercel/analytics/react"
 
 
 const TIMES = ['10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '13:00', '13:30', '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00', '20:30'];
@@ -99,7 +100,7 @@ export default function App() {
       );
       const confirmMsg = `გამარჯობა ${booking.name}! თქვენი ჯავშანი დადასტურდა ✓\n\nსტილისტი: ${selectedStaff.name['GEO']}\nთარიღი: ${selectedDate}\nდრო: ${booking.time}\nსერვისები: ${selectedServices.map(s => s.name[lang]).join(', ')}\nჯამი: ${totalPrice}₾\n\nგმადლობთ! Rigshi Luxury 🖤`;
       const encodedConfirm = encodeURIComponent(confirmMsg);
-      window.open(`https://wa.me/${booking.phone}?text=${encodedConfirm}`, '_blank');
+      // window.open(`https://wa.me/${booking.phone}?text=${encodedConfirm}`, '_blank');
       setStep(5);
       confetti({
         particleCount: 100,
@@ -461,6 +462,7 @@ export default function App() {
           <p className="text-[9px] text-zinc-700 font-black uppercase tracking-[0.5em]">RIGSHI LUXURY 2026</p>
         </footer>
       </div>
+      <Analytics />
     </div>
   );
 }
