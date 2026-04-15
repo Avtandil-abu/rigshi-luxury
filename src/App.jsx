@@ -286,7 +286,7 @@ export default function App() {
                     {priceSpring.value.to(v => `${Math.round(v)} ₾`)}
                   </animated.p>
                 </div>
-                <div className="flex-1 overflow-y-auto py-6 no-scrollbar">
+                <div className="flex-1 overflow-y-auto overflow-x-hidden px-4 py-6 no-scrollbar">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                     {SALON_DATA.services.map(s => {
                       const isSel = selectedServices.some(x => x.id === s.id);
@@ -384,9 +384,13 @@ export default function App() {
                     return (
                       <motion.button
                         key={t_val}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: TIMES.indexOf(t_val) * 0.05 }}
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{
+                          duration: 0.4,
+                          delay: TIMES.indexOf(t_val) * 0.02,
+                          ease: "easeOut"
+                        }}
                         disabled={isBooked}
                         onClick={() => { setBooking({ ...booking, time: t_val }); setStep(4) }}
                         className={`py-5 rounded-2xl border font-black text-sm transition-all ${isBooked
